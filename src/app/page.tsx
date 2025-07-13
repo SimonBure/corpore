@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 import { LayoutDashboard } from "./components/LayoutDashboard";
 import { ButtonPrimary } from "./components/ButtonPrimary";
 import { StatsCard } from "./components/StatsCard";
-import { WorkoutDurationChart } from '@/components/analytics/WorkoutDurationChart';
-import { ExerciseProgressChart } from '@/components/analytics/ExerciseProgressChart';
+import { ChartContainer } from '@/components/analytics/ChartContainer';
 import { PhotoGallery } from '@/components/gallery/PhotoGallery';
 import { sessionApi } from '@/lib/api';
 import { Session } from '@/types';
@@ -133,19 +132,7 @@ export default function DashboardPage() {
       case 'analytics':
         return (
           <section className="w-[90%] mx-auto space-y-8">
-            <div>
-              <h2 className="text-xl font-semibold mb-6">Workout Analytics</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-medium mb-4">Workout Duration Trends</h3>
-                  <WorkoutDurationChart />
-                </div>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-medium mb-4">Exercise Progress</h3>
-                  <ExerciseProgressChart />
-                </div>
-              </div>
-            </div>
+            <ChartContainer />
           </section>
         );
       
