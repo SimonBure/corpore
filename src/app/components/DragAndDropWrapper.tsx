@@ -5,21 +5,13 @@ import {
   Draggable,
   DropResult,
 } from '@hello-pangea/dnd';
-
-interface Exercise {
-  id: number;
-  name: string;
-  sets: number;
-  reps: number;
-  restBetweenSets: number;
-  restAfter: string;
-}
+import { SessionExercise } from '@/types';
 
 interface DragAndDropWrapperProps {
-  exercises: Exercise[];
-  onReorder: (exercises: Exercise[]) => void;
-  onEdit: (id: number) => void;
-  onRemove: (id: number) => void;
+  exercises: SessionExercise[];
+  onReorder: (exercises: SessionExercise[]) => void;
+  onEdit: (exerciseId: number) => void;
+  onRemove: (exerciseId: number) => void;
 }
 
 export const DragAndDropWrapper: React.FC<DragAndDropWrapperProps> = ({ exercises, onReorder, onEdit, onRemove }) => {
@@ -41,7 +33,7 @@ export const DragAndDropWrapper: React.FC<DragAndDropWrapperProps> = ({ exercise
             className={`space-y-3 min-h-[200px] p-2 rounded-lg border-2 ${snapshot.isDraggingOver ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'}`}
           >
             {exercises.map((ex, idx) => (
-              <Draggable key={ex.id} draggableId={ex.id.toString()} index={idx}>
+              <Draggable key={`${ex.exerciseId}-${idx}`} draggableId={`${ex.exerciseId}-${idx}`} index={idx}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -50,12 +42,23 @@ export const DragAndDropWrapper: React.FC<DragAndDropWrapperProps> = ({ exercise
                     className={`flex items-center justify-between p-4 rounded shadow border transition ${snapshot.isDragging ? 'bg-blue-100 border-blue-400 scale-105' : 'bg-white border-gray-200'}`}
                   >
                     <div>
-                      <div className="font-semibold text-gray-800">{ex.name}</div>
-                      <div className="text-xs text-gray-500">{ex.sets}x{ex.reps} • Repos: {ex.restBetweenSets}s / {ex.restAfter}</div>
+                      <div className="font-semibold text-gray-800">{ex.exercise?.name || 'Unknown Exercise'}</div>
+                      <div className="text-xs text-gray-500">
+                        {ex.sets}x{ex.reps ? `${ex.reps} reps` : `${ex.durationSeconds}s`} • Repos: {ex.restBetweenSets}s / {ex.restAfter}s
+                      </div>
+                      {ex.exercise?.muscleGroups && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {ex.exercise.muscleGroups.map((muscle, index) => (
+                            <span key={index} className="text-xs bg-gray-100 text-gray-600 px-1 py-0.5 rounded">
+                              {muscle}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex gap-2">
-                      <button className="text-blue-600 hover:underline" onClick={() => onEdit(ex.id)}>Éditer</button>
-                      <button className="text-red-500 hover:underline" onClick={() => onRemove(ex.id)}>Supprimer</button>
+                      <button className="text-blue-600 hover:underline" onClick={() => onEdit(ex.exerciseId)}>Éditer</button>
+                      <button className="text-red-500 hover:underline" onClick={() => onRemove(ex.exerciseId)}>Supprimer</button>
                     </div>
                   </div>
                 )}

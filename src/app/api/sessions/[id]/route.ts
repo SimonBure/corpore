@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { ApiResponse, Session, CreateSessionRequest, ExerciseCategory } from '@/types';
+import { ApiResponse, Session, ExerciseCategory } from '@/types';
 
 const prisma = new PrismaClient();
 
-export async function GET(): Promise<NextResponse<ApiResponse<Session[]>>> {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse<ApiResponse<Session>>> {
   try {
-    const sessions = await prisma.session.findMany({
+    const { id } = await params;
+    const session = await prisma.session.findUnique({
+      where: { id },
       include: {
         sessionExercises: {
           include: {
@@ -16,13 +21,17 @@ export async function GET(): Promise<NextResponse<ApiResponse<Session[]>>> {
             order: 'asc'
           }
         }
-      },
-      orderBy: {
-        date: 'desc'
       }
     });
     
-    const formattedSessions: Session[] = sessions.map(session => ({
+    if (!session) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Session not found' 
+      }, { status: 404 });
+    }
+    
+    const formattedSession: Session = {
       ...session,
       sessionExercises: session.sessionExercises.map(se => ({
         ...se,
@@ -34,47 +43,36 @@ export async function GET(): Promise<NextResponse<ApiResponse<Session[]>>> {
           muscleGroups: JSON.parse(se.exercise.muscleGroups)
         } : undefined
       }))
-    }));
+    };
     
-    return NextResponse.json({ success: true, data: formattedSessions });
+    return NextResponse.json({ success: true, data: formattedSession });
   } catch (error) {
-    console.error('Failed to fetch sessions:', error);
+    console.error('Failed to fetch session:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to fetch sessions' 
+      error: 'Failed to fetch session' 
     }, { status: 500 });
   }
 }
 
-export async function POST(request: Request): Promise<NextResponse<ApiResponse<Session>>> {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse<ApiResponse<Session>>> {
   try {
-    const body: CreateSessionRequest = await request.json();
-    const { title, date, warmupSeconds, isTemplate, exercises } = body;
+    const { id } = await params;
+    const body = await request.json();
+    const { title, date, warmupSeconds, isTemplate, completed, duration } = body;
     
-    if (!title || !date || !exercises || exercises.length === 0) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Title, date, and exercises are required' 
-      }, { status: 400 });
-    }
-    
-    const session = await prisma.session.create({
+    const session = await prisma.session.update({
+      where: { id },
       data: {
         title,
-        date: new Date(date),
-        warmupSeconds: warmupSeconds || 0,
+        date: date ? new Date(date) : undefined,
+        warmupSeconds,
         isTemplate,
-        sessionExercises: {
-          create: exercises.map(exercise => ({
-            exerciseId: exercise.exerciseId,
-            sets: exercise.sets,
-            reps: exercise.reps,
-            durationSeconds: exercise.durationSeconds,
-            restBetweenSets: exercise.restBetweenSets,
-            restAfter: exercise.restAfter,
-            order: exercise.order
-          }))
-        }
+        completed,
+        duration
       },
       include: {
         sessionExercises: {
@@ -104,10 +102,30 @@ export async function POST(request: Request): Promise<NextResponse<ApiResponse<S
     
     return NextResponse.json({ success: true, data: formattedSession });
   } catch (error) {
-    console.error('Failed to create session:', error);
+    console.error('Failed to update session:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to create session' 
+      error: 'Failed to update session' 
+    }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse<ApiResponse<null>>> {
+  try {
+    const { id } = await params;
+    await prisma.session.delete({
+      where: { id }
+    });
+    
+    return NextResponse.json({ success: true, data: null });
+  } catch (error) {
+    console.error('Failed to delete session:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Failed to delete session' 
     }, { status: 500 });
   }
 }

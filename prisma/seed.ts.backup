@@ -1,0 +1,170 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const exercises = [
+  // Upper Body - Chest
+  { name: 'Push-ups', category: 'strength', muscleGroups: ['chest', 'shoulders', 'triceps'], defaultSets: 3, defaultReps: 12, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Incline Push-ups', category: 'strength', muscleGroups: ['chest', 'shoulders'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Decline Push-ups', category: 'strength', muscleGroups: ['chest', 'shoulders'], defaultSets: 3, defaultReps: 8, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Diamond Push-ups', category: 'strength', muscleGroups: ['chest', 'triceps'], defaultSets: 3, defaultReps: 6, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Wide Push-ups', category: 'strength', muscleGroups: ['chest', 'shoulders'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  
+  // Upper Body - Back
+  { name: 'Pull-ups', category: 'strength', muscleGroups: ['back', 'biceps'], defaultSets: 3, defaultReps: 8, defaultRestBetweenSets: 90, defaultRestAfter: 120 },
+  { name: 'Chin-ups', category: 'strength', muscleGroups: ['back', 'biceps'], defaultSets: 3, defaultReps: 6, defaultRestBetweenSets: 90, defaultRestAfter: 120 },
+  { name: 'Inverted Rows', category: 'strength', muscleGroups: ['back', 'biceps'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Superman', category: 'strength', muscleGroups: ['back', 'glutes'], defaultSets: 3, defaultReps: 15, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  
+  // Upper Body - Shoulders
+  { name: 'Pike Push-ups', category: 'strength', muscleGroups: ['shoulders', 'triceps'], defaultSets: 3, defaultReps: 8, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Wall Handstand Hold', category: 'strength', muscleGroups: ['shoulders', 'core'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Arm Circles', category: 'flexibility', muscleGroups: ['shoulders'], defaultSets: 2, defaultReps: 20, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  
+  // Upper Body - Arms
+  { name: 'Tricep Dips', category: 'strength', muscleGroups: ['triceps', 'shoulders'], defaultSets: 3, defaultReps: 12, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Wall Push-ups', category: 'strength', muscleGroups: ['chest', 'triceps'], defaultSets: 3, defaultReps: 15, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  
+  // Lower Body
+  { name: 'Squats', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 15, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Jump Squats', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Lunges', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 12, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Reverse Lunges', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Bulgarian Split Squats', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 8, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Calf Raises', category: 'strength', muscleGroups: ['calves'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Single Leg Calf Raises', category: 'strength', muscleGroups: ['calves'], defaultSets: 3, defaultReps: 15, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Glute Bridges', category: 'strength', muscleGroups: ['glutes', 'hamstrings'], defaultSets: 3, defaultReps: 15, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Single Leg Glute Bridges', category: 'strength', muscleGroups: ['glutes', 'hamstrings'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Wall Sit', category: 'strength', muscleGroups: ['quadriceps', 'glutes'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  
+  // Core
+  { name: 'Plank', category: 'strength', muscleGroups: ['core'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Side Plank', category: 'strength', muscleGroups: ['core', 'obliques'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Crunches', category: 'strength', muscleGroups: ['core'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Bicycle Crunches', category: 'strength', muscleGroups: ['core', 'obliques'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Mountain Climbers (Strength)', category: 'strength', muscleGroups: ['core', 'shoulders'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Dead Bug', category: 'strength', muscleGroups: ['core'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Bird Dog', category: 'strength', muscleGroups: ['core', 'back'], defaultSets: 3, defaultReps: 10, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Russian Twists', category: 'strength', muscleGroups: ['core', 'obliques'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  { name: 'Leg Raises', category: 'strength', muscleGroups: ['core'], defaultSets: 3, defaultReps: 12, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  
+  // Cardio
+  { name: 'Jumping Jacks', category: 'cardio', muscleGroups: ['full body'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'High Knees', category: 'cardio', muscleGroups: ['legs', 'core'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Butt Kickers', category: 'cardio', muscleGroups: ['legs'], defaultSets: 3, defaultReps: 30, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Burpees', category: 'cardio', muscleGroups: ['full body'], defaultSets: 3, defaultReps: 8, defaultRestBetweenSets: 60, defaultRestAfter: 120 },
+  { name: 'Mountain Climbers (Cardio)', category: 'cardio', muscleGroups: ['core', 'shoulders'], defaultSets: 3, defaultReps: 20, defaultRestBetweenSets: 45, defaultRestAfter: 90 },
+  
+  // Flexibility
+  { name: 'Cat-Cow Stretch', category: 'flexibility', muscleGroups: ['back', 'core'], defaultSets: 2, defaultReps: 10, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Downward Dog', category: 'flexibility', muscleGroups: ['hamstrings', 'calves', 'shoulders'], defaultSets: 2, defaultReps: 30, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Child\'s Pose', category: 'flexibility', muscleGroups: ['back', 'shoulders'], defaultSets: 2, defaultReps: 30, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Hip Circles', category: 'flexibility', muscleGroups: ['hips'], defaultSets: 2, defaultReps: 10, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Leg Swings', category: 'flexibility', muscleGroups: ['hips', 'legs'], defaultSets: 2, defaultReps: 10, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Shoulder Rolls', category: 'flexibility', muscleGroups: ['shoulders'], defaultSets: 2, defaultReps: 10, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+  { name: 'Neck Rolls', category: 'flexibility', muscleGroups: ['neck'], defaultSets: 2, defaultReps: 5, defaultRestBetweenSets: 30, defaultRestAfter: 60 },
+];
+
+const templates = [
+  {
+    title: 'Upper Body Strength',
+    date: new Date(),
+    warmupTime: 300,
+    isTemplate: true,
+    exercises: [
+      { name: 'Push-ups', sets: 3, reps: 12, restBetweenSets: 60, restAfter: 120, order: 1 },
+      { name: 'Pull-ups', sets: 3, reps: 8, restBetweenSets: 90, restAfter: 120, order: 2 },
+      { name: 'Tricep Dips', sets: 3, reps: 10, restBetweenSets: 60, restAfter: 120, order: 3 },
+      { name: 'Pike Push-ups', sets: 3, reps: 8, restBetweenSets: 60, restAfter: 120, order: 4 },
+    ]
+  },
+  {
+    title: 'Lower Body Power',
+    date: new Date(),
+    warmupTime: 300,
+    isTemplate: true,
+    exercises: [
+      { name: 'Squats', sets: 3, reps: 15, restBetweenSets: 60, restAfter: 120, order: 1 },
+      { name: 'Jump Squats', sets: 3, reps: 10, restBetweenSets: 60, restAfter: 120, order: 2 },
+      { name: 'Lunges', sets: 3, reps: 12, restBetweenSets: 60, restAfter: 120, order: 3 },
+      { name: 'Glute Bridges', sets: 3, reps: 15, restBetweenSets: 45, restAfter: 90, order: 4 },
+    ]
+  },
+  {
+    title: 'Core Blaster',
+    date: new Date(),
+    warmupTime: 180,
+    isTemplate: true,
+    exercises: [
+      { name: 'Plank', sets: 3, reps: 30, restBetweenSets: 60, restAfter: 120, order: 1 },
+      { name: 'Crunches', sets: 3, reps: 20, restBetweenSets: 45, restAfter: 90, order: 2 },
+      { name: 'Bicycle Crunches', sets: 3, reps: 20, restBetweenSets: 45, restAfter: 90, order: 3 },
+      { name: 'Russian Twists', sets: 3, reps: 20, restBetweenSets: 45, restAfter: 90, order: 4 },
+    ]
+  },
+];
+
+async function main() {
+  console.log('Starting seeding...');
+  
+  // Clear existing data
+  await prisma.sessionExercise.deleteMany({});
+  await prisma.session.deleteMany({});
+  await prisma.exercise.deleteMany({});
+  
+  // Seed exercises
+  for (const exercise of exercises) {
+    await prisma.exercise.create({
+      data: {
+        ...exercise,
+        muscleGroups: JSON.stringify(exercise.muscleGroups)
+      }
+    });
+  }
+  
+  // Seed templates
+  for (const template of templates) {
+    // Find exercise IDs
+    const templateExercises = await Promise.all(
+      template.exercises.map(async (ex) => {
+        const exercise = await prisma.exercise.findUnique({
+          where: { name: ex.name }
+        });
+        return {
+          ...ex,
+          exerciseId: exercise!.id
+        };
+      })
+    );
+    
+    await prisma.session.create({
+      data: {
+        title: template.title,
+        date: template.date,
+        warmupTime: template.warmupTime,
+        isTemplate: template.isTemplate,
+        sessionExercises: {
+          create: templateExercises.map(ex => ({
+            exerciseId: ex.exerciseId,
+            sets: ex.sets,
+            reps: ex.reps,
+            restBetweenSets: ex.restBetweenSets,
+            restAfter: ex.restAfter,
+            order: ex.order
+          }))
+        }
+      }
+    });
+  }
+  
+  console.log('Seeding completed!');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
