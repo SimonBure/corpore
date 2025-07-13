@@ -27,9 +27,18 @@ interface WorkoutDurationChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    
+    // Use the original date from data instead of the formatted label
+    const displayDate = new Date(data.date).toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    
     return (
       <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-lg">
-        <p className="text-sm text-gray-600">{new Date(label).toLocaleDateString()}</p>
+        <p className="text-sm text-gray-600 font-medium">{displayDate}</p>
         <p className="font-semibold text-blue-600">
           Duration: {formatDuration(data.duration)}
         </p>

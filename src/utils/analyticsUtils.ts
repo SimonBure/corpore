@@ -20,6 +20,8 @@ export interface ExerciseProgressionData {
   averageReps: number;
   averageWeight: number;
   totalVolume: number;
+  averageDuration?: number; // For duration-based exercises (in seconds)
+  isDurationBased?: boolean;
 }
 
 export interface ExerciseHistoryItem {
@@ -111,6 +113,11 @@ export async function getExerciseProgressionData(
             id: true,
             date: true
           }
+        },
+        exercise: {
+          select: {
+            isDurationBased: true
+          }
         }
       },
       orderBy: {
@@ -122,31 +129,44 @@ export async function getExerciseProgressionData(
     const sessionsWithData = sessionExercises.filter(se => se.actualSets !== null);
     
     return sessionsWithData.map(se => {
+      const isDurationBased = se.exercise?.isDurationBased || false;
       const actualReps = se.actualReps ? JSON.parse(se.actualReps) : [];
       const weights = se.weight ? JSON.parse(se.weight) : [];
       
-      // Calculate averages
-      const averageReps = actualReps.length > 0 
-        ? actualReps.reduce((sum: number, reps: number) => sum + reps, 0) / actualReps.length 
-        : 0;
+      let averageReps = 0;
+      let averageDuration = 0;
+      
+      if (isDurationBased) {
+        // For duration-based exercises, actualReps contains duration values in seconds
+        averageDuration = actualReps.length > 0 
+          ? actualReps.reduce((sum: number, duration: number) => sum + duration, 0) / actualReps.length 
+          : 0;
+      } else {
+        // For rep-based exercises, calculate average reps
+        averageReps = actualReps.length > 0 
+          ? actualReps.reduce((sum: number, reps: number) => sum + reps, 0) / actualReps.length 
+          : 0;
+      }
       
       const averageWeight = weights.length > 0 
         ? weights.reduce((sum: number, weight: number) => sum + weight, 0) / weights.length 
         : 0;
       
-      // Calculate total volume (weight × reps)
-      const totalVolume = actualReps.reduce((total: number, reps: number, index: number) => {
+      // Calculate total volume (weight × reps or weight × duration)
+      const totalVolume = actualReps.reduce((total: number, value: number, index: number) => {
         const weight = weights[index] || 0;
-        return total + (reps * weight);
+        return total + (value * weight);
       }, 0);
 
       return {
         date: se.session.date.toISOString().split('T')[0],
         sessionId: se.session.id,
         actualSets: se.actualSets || 0,
-        averageReps: Math.round(averageReps * 10) / 10, // Round to 1 decimal
+        averageReps: Math.round(averageReps * 10) / 10,
         averageWeight: Math.round(averageWeight * 10) / 10,
-        totalVolume: Math.round(totalVolume)
+        totalVolume: Math.round(totalVolume),
+        averageDuration: Math.round(averageDuration * 10) / 10,
+        isDurationBased
       };
     });
   } catch (error) {
