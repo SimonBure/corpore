@@ -118,28 +118,12 @@ export async function deletePhotoFile(
 }
 
 /**
- * Get image dimensions from file
+ * Get image dimensions from file (server-side safe)
  */
 export async function getImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({
-        width: img.naturalWidth,
-        height: img.naturalHeight
-      });
-    };
-    
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve(null);
-    };
-    
-    img.src = url;
-  });
+  // Image dimensions cannot be calculated server-side without additional libraries
+  // Return null for now - dimensions can be calculated client-side if needed
+  return null;
 }
 
 /**

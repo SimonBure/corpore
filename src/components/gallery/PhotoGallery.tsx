@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { PhotoTimeline } from './PhotoTimeline';
 import { WebcamCapture } from './WebcamCapture';
 import { PhotoUpload } from './PhotoUpload';
 
-export const PhotoGallery: React.FC = () => {
+interface PhotoGalleryProps {
+  onPhotoSuccess?: () => void;
+}
+
+export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onPhotoSuccess }) => {
   const [activeModal, setActiveModal] = useState<'webcam' | 'upload' | null>(null);
+  const refreshPhotosRef = useRef<(() => void) | null>(null);
 
   const handlePhotoCapture = async (file: File) => {
     try {
@@ -21,8 +26,10 @@ export const PhotoGallery: React.FC = () => {
       
       if (result.success) {
         setActiveModal(null);
-        // The PhotoTimeline component will automatically refresh
-        window.location.reload(); // Simple refresh for now
+        // Switch to Evolution Gallery tab
+        onPhotoSuccess?.();
+        // Refresh photos without page reload
+        refreshPhotosRef.current?.();
       } else {
         console.error('Failed to save photo:', result.error);
         alert('Failed to save photo. Please try again.');
@@ -48,8 +55,10 @@ export const PhotoGallery: React.FC = () => {
       
       if (result.success) {
         setActiveModal(null);
-        // The PhotoTimeline component will automatically refresh
-        window.location.reload(); // Simple refresh for now
+        // Switch to Evolution Gallery tab
+        onPhotoSuccess?.();
+        // Refresh photos without page reload
+        refreshPhotosRef.current?.();
       } else {
         console.error('Failed to upload photo:', result.error);
         alert('Failed to upload photo. Please try again.');
@@ -65,6 +74,7 @@ export const PhotoGallery: React.FC = () => {
       <PhotoTimeline
         onTakePhoto={() => setActiveModal('webcam')}
         onUploadPhoto={() => setActiveModal('upload')}
+        onRefresh={(refreshFn) => { refreshPhotosRef.current = refreshFn; }}
       />
       
       {activeModal === 'webcam' && (

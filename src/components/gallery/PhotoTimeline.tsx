@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Photo } from '@/types';
 import { PhotoCard } from './PhotoCard';
 import { EmptyGallery } from './EmptyGallery';
@@ -7,14 +7,16 @@ import { PhotoModal } from './PhotoModal';
 interface PhotoTimelineProps {
   onTakePhoto: () => void;
   onUploadPhoto: () => void;
+  onRefresh?: (refreshFn: () => void) => void;
 }
 
-export const PhotoTimeline: React.FC<PhotoTimelineProps> = ({ onTakePhoto, onUploadPhoto }) => {
+export const PhotoTimeline: React.FC<PhotoTimelineProps> = ({ onTakePhoto, onUploadPhoto, onRefresh }) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [groupBy, setGroupBy] = useState<'date' | 'month'>('date');
+  const onRefreshRef = useRef(onRefresh);
 
   const fetchPhotos = useCallback(async () => {
     try {
@@ -39,6 +41,18 @@ export const PhotoTimeline: React.FC<PhotoTimelineProps> = ({ onTakePhoto, onUpl
 
   useEffect(() => {
     fetchPhotos();
+  }, [fetchPhotos]);
+
+  // Update ref when onRefresh prop changes
+  useEffect(() => {
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
+
+  // Expose fetchPhotos through onRefresh prop
+  useEffect(() => {
+    if (onRefreshRef.current) {
+      onRefreshRef.current(fetchPhotos);
+    }
   }, [fetchPhotos]);
 
   const handlePhotoDeleted = useCallback((photoId: string) => {
@@ -119,7 +133,7 @@ export const PhotoTimeline: React.FC<PhotoTimelineProps> = ({ onTakePhoto, onUpl
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h2 className="text-xl font-bold text-gray-900">
-            Progress Gallery ({photos.length} photos)
+            Evolution Gallery ({photos.length} photos)
           </h2>
           
           {/* Group by toggle */}
