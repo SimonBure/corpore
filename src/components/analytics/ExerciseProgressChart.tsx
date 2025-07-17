@@ -59,7 +59,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         {isDurationBased ? (
           <>
             <p className="text-sm">
-              <span className="font-medium text-blue-600">Avg Duration:</span> {formatDuration(data.averageDuration || 0)}
+              <span className="font-medium text-blue-600">Durée moy. :</span> {formatDuration(data.averageDuration || 0)}
             </p>
             <p className="text-sm">
               <span className="font-medium text-green-600">Poids Moy. :</span> {data.averageWeight} kg
@@ -71,7 +71,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         ) : (
           <>
             <p className="text-sm">
-              <span className="font-medium text-blue-600">Avg Reps:</span> {data.averageReps}
+              <span className="font-medium text-blue-600">Répétitions moy. :</span> {data.averageReps}
             </p>
             <p className="text-sm">
               <span className="font-medium text-green-600">Poids Moy. :</span> {data.averageWeight} kg
@@ -162,7 +162,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
     <div className="w-full">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          {exerciseName} Progress
+          Progrès sur l'exercice {exerciseName}
         </h3>
         
         {/* Metric Toggles */}
@@ -177,7 +177,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
                   : 'bg-gray-100 text-gray-600 border border-gray-300'
               }`}
             >
-              Reps
+              Répétitions
             </button>
           )}
           
@@ -191,7 +191,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
                   : 'bg-gray-100 text-gray-600 border border-gray-300'
               }`}
             >
-              Duration
+              Durée
             </button>
           )}
           
@@ -203,7 +203,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
                 : 'bg-gray-100 text-gray-600 border border-gray-300'
             }`}
           >
-            Weight
+            Poids
           </button>
           <button
             onClick={() => toggleMetric('volume')}
@@ -241,7 +241,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
               dataKey="averageReps"
               stroke="#3b82f6"
               strokeWidth={2}
-              name="Avg Reps"
+              name="Répétitions moy."
               dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
               activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
             />
@@ -253,7 +253,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
               dataKey="averageDuration"
               stroke="#3b82f6"
               strokeWidth={2}
-              name="Avg Duration (s)"
+              name="Durée moy. (s)"
               dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
               activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
             />
@@ -265,7 +265,7 @@ export const ExerciseProgressChart: React.FC<ExerciseProgressChartProps> = ({
               dataKey="averageWeight"
               stroke="#10b981"
               strokeWidth={2}
-              name="Avg Weight (kg)"
+              name="Poids moy. (kg)"
               dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
               activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
             />
