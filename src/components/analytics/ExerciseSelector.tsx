@@ -25,7 +25,7 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
     return (
       <div className="flex items-center space-x-2">
         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-        <span className="text-gray-500">Loading exercises...</span>
+        <span className="text-gray-500">Chargement des exercices...</span>
       </div>
     );
   }
@@ -33,8 +33,8 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
   if (exercises.length === 0) {
     return (
       <div className="text-center py-4">
-        <p className="text-gray-600">No exercises with progress data found</p>
-        <p className="text-sm text-gray-500">Complete some workouts to see exercise progress!</p>
+        <p className="text-gray-600">Aucun exercice avec des données de progrès trouvé</p>
+        <p className="text-sm text-gray-500">Terminez des entraînements pour voir les progrès des exercices !</p>
       </div>
     );
   }
@@ -64,8 +64,8 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Select Exercise</h3>
-        <span className="text-sm text-gray-500">{exercises.length} exercises</span>
+        <h3 className="text-lg font-semibold text-gray-900">Sélectionner un Exercice</h3>
+        <span className="text-sm text-gray-500">{exercises.length} exercices</span>
       </div>
       
       {/* Quick selector dropdown for mobile/compact view */}
@@ -78,7 +78,7 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
           }}
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="">Choose an exercise...</option>
+          <option value="">Choisir un exercice...</option>
           {exercises.map((exercise) => (
             <option key={exercise.id} value={exercise.id}>
               {exercise.name} ({exercise.totalSessions} sessions)
@@ -114,7 +114,7 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
                   {exercise.category}
                 </span>
                 <span className="text-xs text-gray-400">
-                  {new Date(exercise.lastUsed).toLocaleDateString()}
+                  {new Date(exercise.lastUsed).toLocaleDateString('fr-FR')}
                 </span>
               </div>
             </div>
@@ -132,10 +132,10 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
                 <span className="text-lg">{getCategoryIcon(selectedExercise.category)}</span>
                 <div>
                   <div className="font-medium text-blue-900">
-                    Showing progress for: {selectedExercise.name}
+                    Progrès pour : {selectedExercise.name}
                   </div>
                   <div className="text-sm text-blue-700">
-                    {selectedExercise.totalSessions} sessions tracked
+                    {selectedExercise.totalSessions} sessions suivies
                   </div>
                 </div>
               </div>

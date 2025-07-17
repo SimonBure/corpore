@@ -113,10 +113,10 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({ className }) => 
   }, [selectedExerciseId, dateRange]);
 
   const dateRangeOptions = [
-    { value: '30d' as DateRange, label: 'Last 30 days' },
-    { value: '3m' as DateRange, label: 'Last 3 months' },
-    { value: '6m' as DateRange, label: 'Last 6 months' },
-    { value: '1y' as DateRange, label: 'Last year' }
+    { value: '30d' as DateRange, label: 'Derniers 30 jours' },
+    { value: '3m' as DateRange, label: 'Derniers 3 mois' },
+    { value: '6m' as DateRange, label: 'Derniers 6 mois' },
+    { value: '1y' as DateRange, label: 'Dernière année' }
   ];
 
   const selectedExercise = exercises.find(e => e.id === selectedExerciseId);
@@ -126,12 +126,12 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({ className }) => 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-          Workout Analytics
+          Statistiques des entraînements
         </h2>
         
         {/* Date Range Selector */}
         <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">Time Period:</label>
+          <label className="text-sm font-medium text-gray-700">Période :</label>
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as DateRange)}
@@ -156,7 +156,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({ className }) => 
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          📊 Workout Duration
+          📊 Durée des entraînements
         </button>
         <button
           onClick={() => setActiveTab('progress')}
@@ -166,7 +166,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({ className }) => 
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          💪 Exercise Progress
+          💪 Progrès sur les exercices
         </button>
       </div>
 

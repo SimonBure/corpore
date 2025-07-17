@@ -20,11 +20,11 @@ export const EmptyGallery: React.FC<EmptyGalleryProps> = ({ onTakePhoto, onUploa
 
         {/* Title and description */}
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Start Your Progress Journey
+          Commencez votre Galerie de l'Évolution !
         </h3>
         <p className="text-gray-600 mb-8">
-          Capture and track your fitness transformation with progress photos. 
-          See your improvement over time and stay motivated!
+          Suivez vos progrès en capturant régulièrement vos muscles et votre corps. 
+          Voyez vos améliorations au fil du temps et restez motivé !
         </p>
 
         {/* Action buttons */}
@@ -37,7 +37,7 @@ export const EmptyGallery: React.FC<EmptyGalleryProps> = ({ onTakePhoto, onUploa
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Take Your First Photo</span>
+            <span>Prendre Votre Première Photo</span>
           </button>
           
           <button
@@ -47,18 +47,18 @@ export const EmptyGallery: React.FC<EmptyGalleryProps> = ({ onTakePhoto, onUploa
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
-            <span>Upload Photo</span>
+            <span>Télécharger Photo</span>
           </button>
         </div>
 
         {/* Tips */}
         <div className="mt-8 p-4 bg-blue-50 rounded-lg text-left">
-          <h4 className="font-medium text-blue-900 mb-2">📸 Photo Tips</h4>
+          <h4 className="font-medium text-blue-900 mb-2">📸 Conseils Photo</h4>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Take photos in consistent lighting</li>
-            <li>• Use the same pose and angle</li>
-            <li>• Wear similar clothing for comparison</li>
-            <li>• Take photos at regular intervals</li>
+            <li>• Prenez des photos avec un éclairage cohérent</li>
+            <li>• Utilisez la même pose et le même angle</li>
+            <li>• Portez des vêtements similaires pour la comparaison</li>
+            <li>• Prenez des photos à intervalles réguliers</li>
           </ul>
         </div>
 
@@ -69,8 +69,8 @@ export const EmptyGallery: React.FC<EmptyGalleryProps> = ({ onTakePhoto, onUploa
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="text-sm text-green-800 text-left">
-              <p className="font-medium">Privacy First</p>
-              <p>Your photos are stored securely on your device and never shared.</p>
+              <p className="font-medium">Confidentialité Avant Tout</p>
+              <p>Vos photos sont stockées en sécurité sur votre appareil et ne sont jamais partagées.</p>
             </div>
           </div>
         </div>

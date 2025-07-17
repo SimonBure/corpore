@@ -36,28 +36,28 @@ export const StatsCard: React.FC<StatsCardProps> = ({ sessions }) => {
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
         <div className="text-2xl font-bold text-blue-600 mb-2">{totalWorkouts}</div>
-        <div className="text-gray-600 text-sm">Total Workouts</div>
+        <div className="text-gray-600 text-sm">Total entraînements</div>
       </div>
 
       <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
         <div className="text-2xl font-bold text-green-600 mb-2">
           {formatTime(totalTime)}
         </div>
-        <div className="text-gray-600 text-sm">Total Time</div>
+        <div className="text-gray-600 text-sm">Temps Total</div>
       </div>
 
       <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
         <div className="text-2xl font-bold text-purple-600 mb-2">
           {totalVolume.toFixed(0)} kg
         </div>
-        <div className="text-gray-600 text-sm">Total Volume</div>
+        <div className="text-gray-600 text-sm">Volume Total</div>
       </div>
 
       <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
         <div className="text-2xl font-bold text-orange-600 mb-2">
           {averageWorkoutTime}m
         </div>
-        <div className="text-gray-600 text-sm">Avg. Duration</div>
+        <div className="text-gray-600 text-sm">Durée Moy.</div>
       </div>
     </div>
   );

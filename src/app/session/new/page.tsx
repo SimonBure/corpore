@@ -187,7 +187,7 @@ export default function NewSessionPage() {
   const handleSaveSession = async () => {
     try {
       const sessionData = {
-        title: `Workout ${new Date().toLocaleDateString()}`,
+        title: `Entraînement du ${new Date().toLocaleDateString('fr-FR')}`,
         date: new Date(),
         warmupSeconds: parseTimeToSeconds(warmupDuration),
         isTemplate: false,
@@ -206,7 +206,7 @@ export default function NewSessionPage() {
       if (response.success && response.data) {
         router.push(`/session/execute/${response.data.id}`);
       } else {
-        setError('Failed to create session');
+        setError('Échec de la création de la session');
       }
     } catch (err) {
       setError('Failed to create session');
@@ -324,7 +324,7 @@ export default function NewSessionPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              New Exercise
+              Nouvel exercice
             </button>
           </div>
           <div className="mb-6 max-h-96 overflow-y-auto">

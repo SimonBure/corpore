@@ -32,7 +32,7 @@ export default function DashboardPage() {
           setRecentSessions(completed);
         }
       } catch (err) {
-        setError('Failed to load recent sessions');
+        setError('Échec du chargement des sessions récentes');
         console.error('Error fetching sessions:', err);
       } finally {
         setLoading(false);
@@ -43,7 +43,7 @@ export default function DashboardPage() {
   }, []);
 
   const formatDate = (date: Date | string): string => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('fr-FR', {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -67,12 +67,12 @@ export default function DashboardPage() {
 
             {/* Recent Workouts */}
             <section className="w-[80%] mx-auto">
-              <h2 className="text-xl font-semibold mb-4">Recent Workouts</h2>
+              <h2 className="text-xl font-semibold mb-4">Entraînements récents</h2>
               
               {loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading recent workouts...</p>
+                  <p className="text-gray-600">Chargement des entraînements récents...</p>
                 </div>
               ) : error ? (
                 <div className="text-center py-8">
@@ -81,10 +81,10 @@ export default function DashboardPage() {
               ) : recentSessions.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
                   <div className="text-6xl mb-4">💪</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No workouts yet</h3>
-                  <p className="text-gray-600 mb-6">Start your fitness journey today!</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun entraînement pour le moment</h3>
+                  <p className="text-gray-600 mb-6">Commencez votre parcours fitness aujourd'hui !</p>
                   <ButtonPrimary onClick={() => router.push("/session/new")}>
-                    Create Your First Workout
+                    Créer Votre Premier Entraînement
                   </ButtonPrimary>
                 </div>
               ) : (
@@ -103,7 +103,7 @@ export default function DashboardPage() {
                       </div>
                       
                       <div className="flex justify-between text-sm text-gray-600 mb-3">
-                        <span>{session.sessionExercises.length} exercises</span>
+                        <span>{session.sessionExercises.length} exercices</span>
                         {session.duration && (
                           <span>{formatDuration(session.duration)}</span>
                         )}
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                         ))}
                         {session.sessionExercises.length > 3 && (
                           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            +{session.sessionExercises.length - 3} more
+                            +{session.sessionExercises.length - 3} de plus
                           </span>
                         )}
                       </div>
@@ -155,10 +155,10 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="flex gap-3">
           <ButtonPrimary onClick={() => router.push("/sessions/history")}>
-            Workout History
+            Historique des entraînements
           </ButtonPrimary>
           <ButtonPrimary onClick={() => router.push("/session/new")}>
-            New Workout
+            Nouvel entraînement
           </ButtonPrimary>
         </div>
       </header>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Overview
+              Aperçu
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Analytics
+              Statistiques
             </button>
             <button
               onClick={() => setActiveTab('gallery')}
@@ -195,7 +195,7 @@ export default function DashboardPage() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Evolution Gallery
+              Galerie de l'Évolution
             </button>
           </nav>
         </div>

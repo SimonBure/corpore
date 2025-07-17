@@ -62,10 +62,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <span className="font-medium text-blue-600">Avg Duration:</span> {formatDuration(data.averageDuration || 0)}
             </p>
             <p className="text-sm">
-              <span className="font-medium text-green-600">Avg Weight:</span> {data.averageWeight} kg
+              <span className="font-medium text-green-600">Poids Moy. :</span> {data.averageWeight} kg
             </p>
             <p className="text-sm">
-              <span className="font-medium text-purple-600">Volume:</span> {data.totalVolume} kg⋅s
+              <span className="font-medium text-purple-600">Volume :</span> {data.totalVolume} kg⋅s
             </p>
           </>
         ) : (
@@ -74,10 +74,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <span className="font-medium text-blue-600">Avg Reps:</span> {data.averageReps}
             </p>
             <p className="text-sm">
-              <span className="font-medium text-green-600">Avg Weight:</span> {data.averageWeight} kg
+              <span className="font-medium text-green-600">Poids Moy. :</span> {data.averageWeight} kg
             </p>
             <p className="text-sm">
-              <span className="font-medium text-purple-600">Volume:</span> {data.totalVolume} kg
+              <span className="font-medium text-purple-600">Volume :</span> {data.totalVolume} kg
             </p>
           </>
         )}

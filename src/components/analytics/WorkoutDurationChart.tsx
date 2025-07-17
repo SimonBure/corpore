@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const data = payload[0].payload;
     
     // Use the original date from data instead of the formatted label
-    const displayDate = new Date(data.date).toLocaleDateString('en-US', {
+    const displayDate = new Date(data.date).toLocaleDateString('fr-FR', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -40,9 +40,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-lg">
         <p className="text-sm text-gray-600 font-medium">{displayDate}</p>
         <p className="font-semibold text-blue-600">
-          Duration: {formatDuration(data.duration)}
+          Durée : {formatDuration(data.duration)}
         </p>
-        <p className="text-sm text-gray-700">Workout: {data.title}</p>
+        <p className="text-sm text-gray-700">Entraînement : {data.title}</p>
       </div>
     );
   }
@@ -66,8 +66,8 @@ export const WorkoutDurationChart: React.FC<WorkoutDurationChartProps> = ({
     return (
       <div className="flex flex-col items-center justify-center text-center" style={{ height }}>
         <div className="text-gray-400 text-4xl mb-2">📊</div>
-        <p className="text-gray-600">No workout data available</p>
-        <p className="text-sm text-gray-500">Complete some workouts to see your progress!</p>
+        <p className="text-gray-600">Aucune donnée d'entraînement disponible</p>
+        <p className="text-sm text-gray-500">Terminez quelques entraînements pour voir vos progrès !</p>
       </div>
     );
   }
@@ -79,7 +79,7 @@ export const WorkoutDurationChart: React.FC<WorkoutDurationChartProps> = ({
   const chartData = data.map(item => ({
     ...item,
     durationMinutes: Math.round(item.duration / 60),
-    formattedDate: new Date(item.date).toLocaleDateString('en-US', {
+    formattedDate: new Date(item.date).toLocaleDateString('fr-FR', {
       month: 'short',
       day: 'numeric'
     })
@@ -100,14 +100,14 @@ export const WorkoutDurationChart: React.FC<WorkoutDurationChartProps> = ({
             stroke="#666"
             fontSize={12}
             tick={{ fill: '#666' }}
-            label={{ value: 'Duration (min)', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Durée (min)', angle: -90, position: 'insideLeft' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine 
             y={Math.round(averageDuration / 60)} 
             stroke="#fbbf24" 
             strokeDasharray="5 5"
-            label={{ value: "Avg", position: "topRight", fill: "#fbbf24" }}
+            label={{ value: "Moy", position: "topRight", fill: "#fbbf24" }}
           />
           <Line
             type="monotone"
@@ -123,15 +123,15 @@ export const WorkoutDurationChart: React.FC<WorkoutDurationChartProps> = ({
       {/* Summary stats */}
       <div className="mt-4 grid grid-cols-3 gap-4 text-center">
         <div className="bg-blue-50 rounded-lg p-3">
-          <div className="text-sm text-blue-600 font-medium">Total Workouts</div>
+          <div className="text-sm text-blue-600 font-medium">Total entraînements</div>
           <div className="text-lg font-bold text-blue-800">{data.length}</div>
         </div>
         <div className="bg-green-50 rounded-lg p-3">
-          <div className="text-sm text-green-600 font-medium">Avg Duration</div>
+          <div className="text-sm text-green-600 font-medium">Durée Moy.</div>
           <div className="text-lg font-bold text-green-800">{formatDuration(averageDuration)}</div>
         </div>
         <div className="bg-purple-50 rounded-lg p-3">
-          <div className="text-sm text-purple-600 font-medium">Longest</div>
+          <div className="text-sm text-purple-600 font-medium">Plus Long</div>
           <div className="text-lg font-bold text-purple-800">
             {formatDuration(Math.max(...data.map(d => d.duration)))}
           </div>

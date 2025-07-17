@@ -36,10 +36,10 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
       if (response.success && response.data) {
         setSession(response.data);
       } else {
-        setError('Session not found');
+        setError('Session introuvable');
       }
     } catch (err) {
-      setError('Failed to load session');
+      setError('Échec du chargement de la session');
       console.error('Error fetching session:', err);
     } finally {
       setLoading(false);
@@ -103,7 +103,7 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
     try {
       // Create a new template based on this session
       const templateData: CreateSessionRequest = {
-        title: `${session.title} (Template)`,
+        title: `${session.title} (Modèle)`,
         date: new Date(),
         warmupSeconds: session.warmupSeconds,
         isTemplate: true,
@@ -148,7 +148,7 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
             onClick={() => router.push('/')} 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Back to Dashboard
+            Retour au Tableau de Bord
           </button>
         </div>
       </div>
@@ -168,19 +168,19 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
           {wasTerminated ? (
             <>
               <div className="text-6xl mb-4">⏹️</div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Workout Ended Early</h1>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Entraînement Interrompu</h1>
               <p className="text-xl text-gray-600">
                 {completionStats.completed > 0 
-                  ? `${completionStats.completed} of ${completionStats.total} exercises completed (${completionStats.percentage}%)`
-                  : "Your progress has been saved"
+                  ? `${completionStats.completed} sur ${completionStats.total} exercices terminés (${completionStats.percentage}%)`
+                  : "Vos progrès ont été sauvegardés"
                 }
               </p>
             </>
           ) : (
             <>
               <div className="text-6xl mb-4">🎉</div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Workout Complete!</h1>
-              <p className="text-xl text-gray-600">Great job finishing your workout</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Entraînement Terminé !</h1>
+              <p className="text-xl text-gray-600">Félicitations pour votre entraînement</p>
             </>
           )}
         </div>
@@ -194,34 +194,34 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
             <div className="text-3xl font-bold text-blue-600 mb-2">
               {session.duration ? formatDuration(session.duration) : 'N/A'}
             </div>
-            <div className="text-gray-600">Total Duration</div>
+            <div className="text-gray-600">Durée totale</div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
             <div className="text-3xl font-bold text-green-600 mb-2">
               {totalReps}
             </div>
-            <div className="text-gray-600">Total Reps</div>
+            <div className="text-gray-600">Répétitions totales</div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
             <div className="text-3xl font-bold text-purple-600 mb-2">
               {totalVolume.toFixed(1)} kg
             </div>
-            <div className="text-gray-600">Total Volume</div>
+            <div className="text-gray-600">Volume total</div>
           </div>
         </div>
 
         {/* Exercise Summary */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {wasTerminated ? 'Completed Exercises' : 'Exercise Summary'}
+            {wasTerminated ? 'Exercices Terminés' : 'Résumé des Exercices'}
           </h2>
           
           {wasTerminated && completedExercises.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 text-4xl mb-4">📝</div>
-              <p className="text-gray-600">No exercises were completed in this session.</p>
+              <p className="text-gray-600">Aucun exercice n'a été terminé dans cette session.</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -231,19 +231,19 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-xl font-semibold text-gray-900">
-                        {exercise.exercise?.name || 'Unknown Exercise'}
+                        {exercise.exercise?.name || 'Exercice Inconnu'}
                       </h3>
                       {exercise.actualSets && exercise.actualSets < exercise.sets && (
                         <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                          Partial
+                          Partiel
                         </span>
                       )}
                     </div>
                     <div className="flex gap-4 text-sm text-gray-600 mt-1">
-                      <span>Target: {exercise.sets} × {exercise.reps}</span>
-                      <span>Actual: {exercise.actualSets || 0} sets</span>
+                      <span>Objectif : {exercise.sets} × {exercise.reps}</span>
+                      <span>Réel : {exercise.actualSets || 0} séries</span>
                       {exercise.actualSets && exercise.actualSets < exercise.sets && (
-                        <span className="text-yellow-600">({exercise.sets - exercise.actualSets} sets incomplete)</span>
+                        <span className="text-yellow-600">({exercise.sets - exercise.actualSets} séries incomplètes)</span>
                       )}
                     </div>
                   </div>
@@ -263,8 +263,8 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {exercise.actualReps.map((reps, setIndex) => (
                       <div key={setIndex} className="bg-gray-50 rounded-lg p-3 text-center">
-                        <div className="text-sm text-gray-600">Set {setIndex + 1}</div>
-                        <div className="font-semibold">{reps} reps</div>
+                        <div className="text-sm text-gray-600">Série {setIndex + 1}</div>
+                        <div className="font-semibold">{reps} rép.</div>
                         {exercise.weight?.[setIndex] && (
                           <div className="text-sm text-gray-600">{exercise.weight[setIndex]} kg</div>
                         )}
@@ -284,21 +284,21 @@ export default function CompleteSessionPage({ params }: CompleteSessionPageProps
             onClick={handleSaveAsTemplate}
             className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
           >
-            Save as Template
+            Sauvegarder comme modèle
           </button>
           
           <button
             onClick={() => router.push('/session/new')}
             className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
           >
-            Start New Workout
+            Commencer un nouvel entraînement
           </button>
           
           <button
             onClick={() => router.push('/')}
             className="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold"
           >
-            Back to Dashboard
+            Retour au Dashboard
           </button>
         </div>
       </main>

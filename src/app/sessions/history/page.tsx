@@ -26,7 +26,7 @@ export default function HistoryPage() {
           setFilteredSessions(response.data);
         }
       } catch (err) {
-        setError('Failed to load sessions');
+        setError('Échec du chargement des sessions');
         console.error('Error fetching sessions:', err);
       } finally {
         setLoading(false);
@@ -62,7 +62,7 @@ export default function HistoryPage() {
   }, [sessions, filter, searchTerm]);
 
   const formatDate = (date: Date | string): string => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('fr-FR', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -109,13 +109,13 @@ export default function HistoryPage() {
   const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (confirm('Are you sure you want to delete this session?')) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette session ?')) {
       try {
         await sessionApi.delete(sessionId);
         setSessions(prev => prev.filter(s => s.id !== sessionId));
       } catch (err) {
         console.error('Error deleting session:', err);
-        alert('Failed to delete session');
+        alert('Échec de la suppression de la session');
       }
     }
   };
@@ -125,7 +125,7 @@ export default function HistoryPage() {
       <LayoutDashboard>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading workout history...</p>
+          <p className="text-gray-600">Chargement de l'historique des entraînements...</p>
         </div>
       </LayoutDashboard>
     );
@@ -140,7 +140,7 @@ export default function HistoryPage() {
             onClick={() => window.location.reload()} 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Retry
+            Réessayer
           </button>
         </div>
       </LayoutDashboard>
@@ -151,12 +151,23 @@ export default function HistoryPage() {
     <LayoutDashboard>
       {/* Header */}
       <header className="w-full flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Workout History</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/')}
+            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Retour au tableau de bord"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+          <h1 className="text-3xl font-bold">Historique des entraînements</h1>
+        </div>
         <button
           onClick={() => router.push('/session/new')}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          New Workout
+          Nouvel Entraînement
         </button>
       </header>
 
@@ -173,7 +184,7 @@ export default function HistoryPage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              All ({sessions.length})
+              Tous ({sessions.length})
             </button>
             <button
               onClick={() => setFilter('completed')}
@@ -183,7 +194,7 @@ export default function HistoryPage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Completed ({sessions.filter(s => s.completed && !s.isTemplate).length})
+              Terminés ({sessions.filter(s => s.completed && !s.isTemplate).length})
             </button>
             <button
               onClick={() => setFilter('templates')}
@@ -193,7 +204,7 @@ export default function HistoryPage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Templates ({sessions.filter(s => s.isTemplate).length})
+              Modèles ({sessions.filter(s => s.isTemplate).length})
             </button>
           </div>
 
@@ -201,7 +212,7 @@ export default function HistoryPage() {
           <div className="flex-1 max-w-md">
             <input
               type="text"
-              placeholder="Search workouts..."
+              placeholder="Rechercher des entraînements..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -215,11 +226,11 @@ export default function HistoryPage() {
         {filteredSessions.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No sessions found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucune session trouvée</h3>
             <p className="text-gray-600">
               {searchTerm 
-                ? 'Try adjusting your search terms'
-                : 'Start by creating your first workout session'
+                ? 'Essayez d\'ajuster vos termes de recherche'
+                : 'Commencez par créer votre première session d\'entraînement'
               }
             </p>
           </div>
@@ -237,24 +248,24 @@ export default function HistoryPage() {
                       <h3 className="text-xl font-semibold text-gray-900">{session.title}</h3>
                       {session.isTemplate && (
                         <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                          Template
+                          Modèle
                         </span>
                       )}
                       {session.completed && (
                         <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                          Completed
+                          Terminé
                         </span>
                       )}
                     </div>
                     
                     <div className="flex items-center gap-6 text-sm text-gray-600 mb-3">
                       <span>{formatDate(session.date)}</span>
-                      <span>{session.sessionExercises.length} exercises</span>
+                      <span>{session.sessionExercises.length} exercices</span>
                       {session.duration && (
                         <span>{formatDuration(session.duration)}</span>
                       )}
                       {session.completed && (
-                        <span>{getTotalVolume(session).toFixed(0)} kg volume</span>
+                        <span>{getTotalVolume(session).toFixed(0)} kg de volume</span>
                       )}
                     </div>
 
@@ -266,7 +277,7 @@ export default function HistoryPage() {
                       ))}
                       {session.sessionExercises.length > 4 && (
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                          +{session.sessionExercises.length - 4} more
+                          +{session.sessionExercises.length - 4} de plus
                         </span>
                       )}
                     </div>
@@ -275,7 +286,7 @@ export default function HistoryPage() {
                   <button
                     onClick={(e) => handleDeleteSession(session.id, e)}
                     className="ml-4 p-2 text-gray-400 hover:text-red-500 transition-colors"
-                    aria-label="Delete session"
+                    aria-label="Supprimer la session"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
