@@ -12,6 +12,8 @@ import {
   getTerminationSummary
 } from '@/utils/workoutAnalysis';
 
+
+
 interface ExecuteSessionPageProps {
   params: Promise<{ id: string }>;
 }
@@ -32,7 +34,7 @@ export default function ExecuteSessionPage({ params }: ExecuteSessionPageProps) 
   const [weights, setWeights] = useState<number[][]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showTerminateDialog, setShowTerminateDialog] = useState(false);
+  const [sessionElapsedTime, setSessionElapsedTime] = useState(0);
 
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -125,6 +127,19 @@ export default function ExecuteSessionPage({ params }: ExecuteSessionPageProps) 
     }
     return () => clearInterval(interval);
   }, [isResting, restTimeLeft]);
+
+  // Global session timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (sessionStartTime && currentPhase === 'exercises') {
+      interval = setInterval(() => {
+        const now = new Date();
+        const elapsed = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+        setSessionElapsedTime(elapsed);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [sessionStartTime, currentPhase]);
 
   const currentExercise = session?.sessionExercises[currentExerciseIndex];
 
@@ -325,7 +340,14 @@ export default function ExecuteSessionPage({ params }: ExecuteSessionPageProps) 
       {/* Header */}
       <header className="bg-white shadow-sm px-6 py-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">{session.title}</h1>
+          <div className="flex items-center gap-6">
+            <h1 className="text-2xl font-bold text-gray-900">{session.title}</h1>
+            {sessionStartTime && currentPhase === 'exercises' && (
+              <div className="text-lg font-mono text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">
+                {Math.floor(sessionElapsedTime / 60)}:{(sessionElapsedTime % 60).toString().padStart(2, '0')}
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-600">
               {currentPhase === 'warmup' ? (
@@ -394,7 +416,6 @@ export default function ExecuteSessionPage({ params }: ExecuteSessionPageProps) 
 // Warmup Screen Component
 function WarmupScreen({ 
   timeLeft, 
-  totalTime, 
   onStart, 
   onComplete, 
   onSkip,
@@ -423,11 +444,11 @@ function WarmupScreen({
         </div>
         
         <p className="text-orange-700 mb-6 text-lg">
-          Échauffement libre - bougez comme vous voulez !
+          Échauffement libre - bougez comme vous voulez&nbsp;!
         </p>
         
         <p className="text-sm text-orange-600 mb-8">
-          Préparez votre corps pour l'entraînement
+          Préparez votre corps pour l&apos;entraînement
         </p>
 
         <div className="space-y-3">
@@ -437,13 +458,13 @@ function WarmupScreen({
                 onClick={onStart}
                 className="w-full px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
               >
-                Commencer l'échauffement
+                Commencer l&apos;échauffement
               </button>
               <button
                 onClick={onSkip}
                 className="w-full px-6 py-2 text-orange-600 border border-orange-300 rounded-lg hover:bg-orange-50 transition-colors"
               >
-                Passer l'échauffement
+                Passer l&apos;échauffement
               </button>
             </>
           ) : (
@@ -451,7 +472,7 @@ function WarmupScreen({
               onClick={onComplete}
               className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
             >
-              Terminer l'échauffement
+              Terminer l&apos;échauffement
             </button>
           )}
         </div>
@@ -475,18 +496,18 @@ function RestScreen({ timeLeft, onSkip, nextExercise }: {
   return (
     <div className="text-center">
       <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Rest Time</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Repos</h2>
         <div className="text-6xl font-mono font-bold text-blue-600 mb-6">
           {formatTime(timeLeft)}
         </div>
         <p className="text-gray-600 mb-8">
-          Next: {nextExercise}
+          Suivant: {nextExercise}
         </p>
         <button
           onClick={onSkip}
           className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
         >
-          Skip Rest
+          Passer repos
         </button>
       </div>
     </div>
@@ -509,6 +530,61 @@ function ExerciseScreen({
 }) {
   const [reps, setReps] = useState(exercise.reps || 0);
   const [weight, setWeight] = useState(0);
+  const [durationLeft, setDurationLeft] = useState(exercise.durationSeconds || 0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [timerCompleted, setTimerCompleted] = useState(false);
+
+  // Reset timer state when currentSet changes
+  useEffect(() => {
+    setDurationLeft(exercise.durationSeconds || 0);
+    setIsTimerActive(false);
+    setTimerCompleted(false);
+  }, [currentSet, exercise.durationSeconds]);
+
+  const isDurationBased = exercise.exercise?.isDurationBased || false;
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Duration timer countdown
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerActive && durationLeft > 0) {
+      interval = setInterval(() => {
+        setDurationLeft(prev => prev - 1);
+      }, 1000);
+    } else if (durationLeft === 0 && isTimerActive) {
+      setIsTimerActive(false);
+      setTimerCompleted(true);
+      // Auto-complete the set when timer finishes
+      onSetComplete(1, weight);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerActive, durationLeft, onSetComplete, weight]);
+
+  const handleCompleteSet = () => {
+    if (isDurationBased) {
+      if (!isTimerActive && !timerCompleted) {
+        // Start timer when button is clicked for duration exercises
+        setIsTimerActive(true);
+        setTimerCompleted(false);
+      } else if (isTimerActive) {
+        // Stop timer and complete set if timer is running
+        setIsTimerActive(false);
+        onSetComplete(1, weight);
+      } else if (timerCompleted) {
+        // If timer already completed, just reset for next set
+        setDurationLeft(exercise.durationSeconds || 0);
+        setTimerCompleted(false);
+      }
+    } else {
+      // For rep-based exercises, complete normally
+      onSetComplete(reps, weight);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
@@ -520,7 +596,12 @@ function ExerciseScreen({
         <div className="flex justify-center items-center gap-4 text-lg text-gray-600">
           <span>Set {currentSet} of {exercise.sets}</span>
           <span>•</span>
-          <span>Target: {exercise.reps} reps</span>
+          <span>
+            {isDurationBased 
+              ? `Target: ${formatTime(exercise.durationSeconds || 0)}`
+              : `Target: ${exercise.reps} reps`
+            }
+          </span>
         </div>
         {exercise.exercise?.muscleGroups && (
           <div className="flex justify-center flex-wrap gap-2 mt-4">
@@ -533,54 +614,110 @@ function ExerciseScreen({
         )}
       </div>
 
-      {/* Input Section */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Reps Completed
-          </label>
-          <input
-            type="number"
-            min="0"
-            value={reps || ""}
-            onChange={(e) => setReps(Number(e.target.value) || 0)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold"
-          />
+      {/* Duration Timer or Input Section */}
+      {isDurationBased ? (
+        <div className="text-center mb-8">
+          {/* Timer Display */}
+          <div className="text-8xl font-mono font-bold text-purple-600 mb-6">
+            {formatTime(durationLeft)}
+          </div>
+          
+          {/* Timer Status */}
+          <div className="mb-6">
+            {timerCompleted && (
+              <div className="text-green-600 font-semibold text-lg mb-2">
+                ✓ Time completed! Set automatically completed.
+              </div>
+            )}
+            {isTimerActive && (
+              <div className="text-purple-600 font-semibold text-lg mb-2">
+                Timer running... Click &quot;Compléter série&quot; to stop early.
+              </div>
+            )}
+            {!isTimerActive && !timerCompleted && (
+              <div className="text-gray-600 font-semibold text-lg mb-2">
+                Click &quot;Compléter série&quot; to start the timer.
+              </div>
+            )}
+          </div>
+
+          {/* Weight Input for Duration Exercises */}
+          <div className="max-w-xs mx-auto mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Poids (kg) - Optionnel
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={weight || ""}
+              onChange={(e) => setWeight(Number(e.target.value) || 0)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-xl font-semibold"
+            />
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Weight (kg)
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.5"
-            value={weight || ""}
-            onChange={(e) => setWeight(Number(e.target.value) || 0)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold"
-          />
+      ) : (
+        /* Rep-based Input Section */
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Reps complétées
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={reps || ""}
+              onChange={(e) => setReps(Number(e.target.value) || 0)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Poids (kg)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={weight || ""}
+              onChange={(e) => setWeight(Number(e.target.value) || 0)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Complete Set Button */}
       <button
-        onClick={() => onSetComplete(reps, weight)}
-        className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg"
+        onClick={handleCompleteSet}
+        className={`w-full px-6 py-4 text-white rounded-lg transition-colors font-semibold text-lg ${
+          isDurationBased 
+            ? 'bg-purple-600 hover:bg-purple-700' 
+            : 'bg-green-600 hover:bg-green-700'
+        }`}
       >
-        Complete Set
+        {isDurationBased 
+          ? (isTimerActive 
+              ? 'Arrêter et compléter série'
+              : (!timerCompleted ? 'Démarrer le chrono' : 'Série suivante')
+            )
+          : 'Compléter série'
+        }
       </button>
 
       {/* Previous Sets */}
       {completedSets.some(reps => reps > 0) && (
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-semibold mb-4">Previous Sets</h3>
+          <h3 className="text-lg font-semibold mb-4">Séries précédentes</h3>
           <div className="grid grid-cols-3 gap-4">
             {completedSets.map((setReps, index) => {
               if (setReps === 0) return null;
               return (
                 <div key={index} className="bg-gray-50 rounded-lg p-3 text-center">
                   <div className="text-sm text-gray-600">Set {index + 1}</div>
-                  <div className="font-semibold">{setReps} reps</div>
+                  <div className="font-semibold">
+                    {isDurationBased ? '✓ Completed' : `${setReps} reps`}
+                  </div>
                   {weights[index] > 0 && (
                     <div className="text-sm text-gray-600">{weights[index]} kg</div>
                   )}

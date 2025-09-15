@@ -72,6 +72,12 @@ export const sessionApi = {
       method: 'DELETE',
     }),
   
+  rename: (id: string, title: string): Promise<ApiResponse<Session>> =>
+    apiRequest<Session>(`/sessions/${id}/rename`, {
+      method: 'PUT',
+      body: JSON.stringify({ title }),
+    }),
+  
   updateExercise: (sessionId: string, exerciseId: number, data: {
     actualSets?: number;
     actualReps?: number[];

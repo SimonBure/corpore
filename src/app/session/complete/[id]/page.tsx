@@ -6,6 +6,8 @@ import { sessionApi } from '@/lib/api';
 import { Session, CreateSessionRequest } from '@/types';
 import { formatDuration } from '@/utils/workoutAnalysis';
 
+
+
 interface CompleteSessionPageProps {
   params: Promise<{ id: string }>;
 }

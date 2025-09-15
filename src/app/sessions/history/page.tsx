@@ -14,6 +14,8 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'completed' | 'templates'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -117,6 +119,40 @@ export default function HistoryPage() {
         console.error('Error deleting session:', err);
         alert('Échec de la suppression de la session');
       }
+    }
+  };
+
+  const handleStartRename = (sessionId: string, currentTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(sessionId);
+    setEditingTitle(currentTitle);
+  };
+
+  const handleCancelRename = () => {
+    setEditingId(null);
+    setEditingTitle('');
+  };
+
+  const handleSaveRename = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!editingTitle.trim()) {
+      alert('Le titre ne peut pas être vide');
+      return;
+    }
+    
+    try {
+      const response = await sessionApi.rename(sessionId, editingTitle.trim());
+      if (response.success && response.data) {
+        setSessions(prev => prev.map(s => 
+          s.id === sessionId ? { ...s, title: response.data!.title } : s
+        ));
+        setEditingId(null);
+        setEditingTitle('');
+      }
+    } catch (err) {
+      console.error('Error renaming session:', err);
+      alert('Échec du renommage');
     }
   };
 
@@ -245,7 +281,55 @@ export default function HistoryPage() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900">{session.title}</h3>
+                      {editingId === session.id ? (
+                        <div className="flex items-center gap-2 flex-1">
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            className="text-xl font-semibold text-gray-900 bg-transparent border-b-2 border-blue-500 focus:outline-none flex-1"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSaveRename(session.id, e);
+                              } else if (e.key === 'Escape') {
+                                handleCancelRename();
+                              }
+                            }}
+                            autoFocus
+                          />
+                          <button
+                            onClick={(e) => handleSaveRename(session.id, e)}
+                            className="p-1 text-green-600 hover:text-green-700"
+                            title="Sauvegarder"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={handleCancelRename}
+                            className="p-1 text-red-600 hover:text-red-700"
+                            title="Annuler"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 className="text-xl font-semibold text-gray-900">{session.title}</h3>
+                          <button
+                            onClick={(e) => handleStartRename(session.id, session.title, e)}
+                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                            title="Renommer"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
                       {session.isTemplate && (
                         <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
                           Modèle

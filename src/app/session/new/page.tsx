@@ -21,6 +21,8 @@ export default function NewSessionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateExerciseModal, setShowCreateExerciseModal] = useState(false);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [editingTemplateTitle, setEditingTemplateTitle] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,6 +90,40 @@ export default function NewSessionPage() {
     
     setSessionExercises((prev) => [...prev, ...templateExercises]);
     setWarmupDuration(`${Math.floor(template.warmupSeconds / 60).toString().padStart(2, '0')}:${(template.warmupSeconds % 60).toString().padStart(2, '0')}`);
+  };
+
+  const handleStartTemplateRename = (templateId: string, currentTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingTemplateId(templateId);
+    setEditingTemplateTitle(currentTitle);
+  };
+
+  const handleCancelTemplateRename = () => {
+    setEditingTemplateId(null);
+    setEditingTemplateTitle('');
+  };
+
+  const handleSaveTemplateRename = async (templateId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!editingTemplateTitle.trim()) {
+      alert('Le titre ne peut pas être vide');
+      return;
+    }
+    
+    try {
+      const response = await sessionApi.rename(templateId, editingTemplateTitle.trim());
+      if (response.success && response.data) {
+        setTemplates(prev => prev.map(t => 
+          t.id === templateId ? { ...t, title: response.data!.title } : t
+        ));
+        setEditingTemplateId(null);
+        setEditingTemplateTitle('');
+      }
+    } catch (err) {
+      console.error('Error renaming template:', err);
+      alert('Échec du renommage');
+    }
   };
 
   // Convert seconds to mm:ss format
@@ -269,7 +305,57 @@ export default function NewSessionPage() {
           <h2 className="text-lg font-semibold mb-4">Templates</h2>
           {templates.map((template) => (
             <div key={template.id} className="bg-white rounded-lg shadow p-4 mb-4 border border-gray-200">
-              <div className="font-bold text-lg text-gray-800 mb-1">{template.title}</div>
+              <div className="flex items-center gap-2 mb-1">
+                {editingTemplateId === template.id ? (
+                  <div className="flex items-center gap-2 flex-1">
+                    <input
+                      type="text"
+                      value={editingTemplateTitle}
+                      onChange={(e) => setEditingTemplateTitle(e.target.value)}
+                      className="font-bold text-lg text-gray-800 bg-transparent border-b-2 border-blue-500 focus:outline-none flex-1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveTemplateRename(template.id, e);
+                        } else if (e.key === 'Escape') {
+                          handleCancelTemplateRename();
+                        }
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={(e) => handleSaveTemplateRename(template.id, e)}
+                      className="p-1 text-green-600 hover:text-green-700"
+                      title="Sauvegarder"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={handleCancelTemplateRename}
+                      className="p-1 text-red-600 hover:text-red-700"
+                      title="Annuler"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="font-bold text-lg text-gray-800">{template.title}</div>
+                    <button
+                      onClick={(e) => handleStartTemplateRename(template.id, template.title, e)}
+                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="Renommer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  </>
+                )}
+              </div>
               <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-2">
                 {template.sessionExercises.map((se, i) => (
                   <span key={i} className="bg-gray-100 rounded px-2 py-0.5">
